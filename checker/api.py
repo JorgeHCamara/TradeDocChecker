@@ -26,7 +26,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.concurrency import run_in_threadpool
 
 from checker.extract import ExtractionError
-from checker.pipeline import TradeReport, check_trade
+from checker.pipeline import check_trade, report_to_dict
 
 load_dotenv()
 
@@ -42,26 +42,6 @@ app = FastAPI(title="Trade Document Checker")
 def get_client() -> anthropic.Anthropic:
     """One shared API client. Tests replace it with a fake (app.dependency_overrides)."""
     return anthropic.Anthropic(max_retries=4)
-
-
-def report_to_dict(report: TradeReport) -> dict:
-    def document(doc: str, result) -> dict:
-        values = result.data.model_dump(mode="json")  # dates become "YYYY-MM-DD"
-        return {
-            name: {**field, "verified": f"{doc}.{name}" not in report.unverified}
-            for name, field in values.items()
-        }
-
-    return {
-        "verdict": report.verdict,
-        "counts": {status: report.count(status) for status in ("FAIL", "REVIEW", "PASS")},
-        "checks": [{"name": c.name, "status": c.status, "message": c.message} for c in report.checks],
-        "contract": document("contract", report.contract),
-        "invoice": document("invoice", report.invoice),
-        "model": report.contract.model,
-        "cost_usd": report.cost_usd,
-        "seconds": round(report.seconds, 1),
-    }
 
 
 def run_check(contract_pdf: Path, invoice_pdf: Path, client: anthropic.Anthropic) -> dict:

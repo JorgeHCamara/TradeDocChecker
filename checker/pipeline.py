@@ -72,6 +72,28 @@ def check_trade(
     return TradeReport(contract, invoice, unverified, checks, time.perf_counter() - started)
 
 
+def report_to_dict(report: TradeReport) -> dict:
+    """The report as plain JSON-ready data (used by the API and the eval)."""
+
+    def document(doc: str, result) -> dict:
+        values = result.data.model_dump(mode="json")  # dates become "YYYY-MM-DD"
+        return {
+            name: {**field, "verified": f"{doc}.{name}" not in report.unverified}
+            for name, field in values.items()
+        }
+
+    return {
+        "verdict": report.verdict,
+        "counts": {status: report.count(status) for status in ("FAIL", "REVIEW", "PASS")},
+        "checks": [{"name": c.name, "status": c.status, "message": c.message} for c in report.checks],
+        "contract": document("contract", report.contract),
+        "invoice": document("invoice", report.invoice),
+        "model": report.contract.model,
+        "cost_usd": report.cost_usd,
+        "seconds": round(report.seconds, 1),
+    }
+
+
 def format_report(report: TradeReport, title: str) -> str:
     lines = [
         f"Trade check: {title}",

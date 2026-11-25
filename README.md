@@ -96,6 +96,7 @@ checker/extract.py      Sends one PDF to the Claude API and returns the extracte
 checker/sources.py      Checks each extracted value's source quote is really in the PDF
 checker/checks.py       The nine comparison checks (plain code)
 checker/pipeline.py     Runs the whole check for one trade and prints the report
+checker/evaluate.py     The eval: runs the test cases on the real API and scores them
 checker/api.py          HTTP API used by the frontend (FastAPI)
 frontend/               React + TypeScript web app (Vite)
 data/cases/case_NNN/    One test case: contract.pdf, invoice.pdf, expected.json (the answer key)
@@ -150,6 +151,25 @@ Production-style (one server): build the frontend once, and the API serves it.
 cd frontend && npm install && npm run build && cd ..
 uvicorn checker.api:app                    # app and API on http://localhost:8000
 ```
+
+## Eval
+
+The tests check the code with a fake API. The eval measures how well the whole
+system performs: it runs the test cases through the real Claude API and compares
+every extracted field and every check result with the answer keys.
+
+```bash
+python -m checker.evaluate --quick     # 6 hard cases, about $0.40: use while iterating
+python -m checker.evaluate             # all 30 cases, about $2 on Claude Opus 5.5
+python -m checker.evaluate --model claude-haiku-5-5 --effort low
+python -m checker.evaluate --rescore results/<run folder>   # re-score saved outputs, free
+```
+
+Each run saves its settings (model, effort, a fingerprint of the prompt and
+schemas, git commit), the raw output of every case and the scorecard to
+`results/`. The most important number is **problems missed**: a planted
+problem that came back PASS. A false alarm costs an analyst a few minutes; a
+missed problem can mean paying for goods outside the contract.
 
 ## Running the tests
 
