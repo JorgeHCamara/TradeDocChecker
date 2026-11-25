@@ -44,4 +44,4 @@ def test_answer_key_matches_schemas(case_dir):
     InvoiceExtraction.model_validate(as_extraction(expected["invoice"]))
 
     assert set(expected["checks"]) == set(CHECK_NAMES)
-    assert set(expected["checks"].values()) <= {"PASS", "FAIL"}
+    assert set(expected["checks"].values()) <= {"PASS", "FAIL", "REVIEW"}

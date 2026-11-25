@@ -1,0 +1,47 @@
+{
+  "case_id": "case_018",
+  "description": "Invoice says FOB Paranaguá; contract is FOB Santos.",
+  "contract": {
+    "contract_number": "CVG-CRN-2026-0233",
+    "contract_date": "2026-07-18",
+    "seller": "Cerrado Verde Grãos Ltda.",
+    "buyer": "Eastbridge Agri Trading Pte. Ltd.",
+    "commodity": "corn",
+    "quantity": 66000,
+    "quantity_unit": "MT",
+    "quantity_tolerance_percent": 5,
+    "unit_price": 212.75,
+    "currency": "USD",
+    "incoterm": "FOB",
+    "incoterm_place": "Santos",
+    "shipment_start": "2026-09-01",
+    "shipment_end": "2026-09-30"
+  },
+  "invoice": {
+    "invoice_number": "CVG-INV-2026-0116",
+    "invoice_date": "2026-09-11",
+    "contract_reference": "CVG-CRN-2026-0233",
+    "seller": "Cerrado Verde Grãos Ltda.",
+    "buyer": "Eastbridge Agri Trading Pte. Ltd.",
+    "commodity": "corn",
+    "quantity": 66900,
+    "quantity_unit": "MT",
+    "unit_price": 212.75,
+    "currency": "USD",
+    "total_amount": 14232975.0,
+    "incoterm": "FOB",
+    "incoterm_place": "Paranaguá",
+    "bill_of_lading_date": "2026-09-08"
+  },
+  "checks": {
+    "seller_matches": "PASS",
+    "buyer_matches": "PASS",
+    "commodity_matches": "PASS",
+    "contract_reference_matches": "PASS",
+    "unit_price_matches": "PASS",
+    "quantity_within_tolerance": "PASS",
+    "total_is_correct": "PASS",
+    "incoterm_matches": "FAIL",
+    "bl_date_within_shipment_period": "PASS"
+  }
+}

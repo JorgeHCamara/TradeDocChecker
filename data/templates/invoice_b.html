@@ -1,0 +1,39 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Invoice $invoice_number</title>
+<style>
+@page { size: A4; margin: 16mm 18mm 18mm 18mm; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 9.5pt; color: #1a1a1a; line-height: 1.45; }
+.top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8mm; }
+.top .name { font-size: 14pt; font-weight: bold; color: #1f3a5f; } .top .addr { font-size: 8.5pt; color: #555; }
+.box { border: 1.5px solid #1f3a5f; padding: 3mm 4mm; min-width: 62mm; }
+.box .t { font-size: 16pt; font-weight: bold; color: #1f3a5f; letter-spacing: 2px; }
+.box table td { padding: 0.5mm 2mm 0.5mm 0; }
+.cols { display: flex; gap: 10mm; margin-bottom: 6mm; } .cols > div { flex: 1; }
+.cap { font-size: 8pt; font-weight: bold; color: #1f3a5f; text-transform: uppercase; border-bottom: 1px solid #ccd; margin-bottom: 1mm; }
+.lines p { margin: 1.5mm 0; }
+.total { margin-top: 6mm; display: flex; justify-content: flex-end; }
+.total div { background: #1f3a5f; color: #fff; padding: 3mm 5mm; font-size: 11pt; font-weight: bold; }
+.small { font-size: 8.5pt; color: #444; margin-top: 8mm; }
+.footer { margin-top: 10mm; text-align: center; font-size: 7.5pt; color: #666; }
+</style></head>
+<body>
+<div class="top">
+  <div><div class="name">$seller_name</div><div class="addr">$seller_address</div></div>
+  <div class="box"><div class="t">INVOICE</div>
+    <table><tr><td>No.</td><td><b>$invoice_number</b></td></tr><tr><td>Date</td><td>$invoice_date</td></tr><tr><td>Your contract</td><td>$contract_reference</td></tr></table>
+  </div>
+</div>
+<div class="cols">
+  <div><div class="cap">Sold to</div><b>$buyer_name</b><br>$buyer_address</div>
+  <div><div class="cap">Shipment</div>Shipped per MV $vessel from $load_port to $discharge_port<br>B/L No. $bl_number dated $bl_date</div>
+</div>
+<div class="cap">Particulars</div>
+<div class="lines">
+  <p><b>Commodity:</b> $commodity_desc</p>
+  <p><b>Net weight shipped:</b> $quantity $unit_plural</p>
+  <p><b>Price:</b> $currency $unit_price per $unit_single, $incoterm_text</p>
+</div>
+<div class="total"><div>Amount due: $currency $total</div></div>
+<p class="small">Payment: cash against documents. Please remit to the account stated in our payment instructions quoting the invoice number above.</p>
+<div class="footer">SAMPLE DOCUMENT – fictional parties and data, created for software testing only.</div>
+</body></html>

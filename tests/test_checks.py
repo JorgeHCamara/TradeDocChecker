@@ -98,6 +98,7 @@ def test_missing_tolerance_needs_review():
         ("Cerrado Verde Grãos Ltda.", "CERRADO VERDE GRAOS LTDA"),
         ("Eastbridge Agri Trading Pte. Ltd.", "Eastbridge Agri Trading Pte Ltd"),
         ("Eastbridge Agri Trading Pte. Ltd.", "EASTBRIDGE AGRI TRADING"),
+        ("Seoha Grain Corporation", "SEOHA GRAIN CORP."),  # found by case_030
     ],
 )
 def test_company_names_that_should_match(a, b):

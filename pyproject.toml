@@ -12,6 +12,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest"]
+generate = ["playwright"]
 
 [build-system]
 requires = ["setuptools>=68"]

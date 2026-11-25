@@ -1,0 +1,47 @@
+{
+  "case_id": "case_005",
+  "description": "Clean. Corn, letter-style contract, ISO dates, bilingual invoice.",
+  "contract": {
+    "contract_number": "PLN/C/2026/118",
+    "contract_date": "2026-06-10",
+    "seller": "Planura Commodities Ltda.",
+    "buyer": "Nordhavn Feed Ingredients A/S",
+    "commodity": "corn",
+    "quantity": 45000,
+    "quantity_unit": "MT",
+    "quantity_tolerance_percent": 5,
+    "unit_price": 238.5,
+    "currency": "USD",
+    "incoterm": "CFR",
+    "incoterm_place": "Aarhus",
+    "shipment_start": "2026-08-01",
+    "shipment_end": "2026-08-31"
+  },
+  "invoice": {
+    "invoice_number": "PLN-FAT-2026-0103",
+    "invoice_date": "2026-08-17",
+    "contract_reference": "PLN/C/2026/118",
+    "seller": "Planura Commodities Ltda.",
+    "buyer": "Nordhavn Feed Ingredients A/S",
+    "commodity": "corn",
+    "quantity": 46020.5,
+    "quantity_unit": "MT",
+    "unit_price": 238.5,
+    "currency": "USD",
+    "total_amount": 10975889.25,
+    "incoterm": "CFR",
+    "incoterm_place": "Aarhus",
+    "bill_of_lading_date": "2026-08-14"
+  },
+  "checks": {
+    "seller_matches": "PASS",
+    "buyer_matches": "PASS",
+    "commodity_matches": "PASS",
+    "contract_reference_matches": "PASS",
+    "unit_price_matches": "PASS",
+    "quantity_within_tolerance": "PASS",
+    "total_is_correct": "PASS",
+    "incoterm_matches": "PASS",
+    "bl_date_within_shipment_period": "PASS"
+  }
+}

@@ -1,0 +1,44 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Commercial Invoice $invoice_number</title>
+<style>
+@page { size: A4; margin: 18mm 16mm 20mm 16mm; }
+body { font-family: "Times New Roman", Times, serif; font-size: 10.5pt; color: #111; line-height: 1.35; }
+h1 { font-size: 15pt; text-align: center; margin: 0 0 6mm 0; }
+.head { display: flex; justify-content: space-between; border-bottom: 1.5px solid #111; padding-bottom: 3mm; margin-bottom: 5mm; }
+.co { font-weight: bold; font-size: 12pt; } .addr { font-size: 9pt; } .meta { text-align: right; font-size: 9.5pt; }
+.parties { display: flex; gap: 6mm; margin-bottom: 4mm; }
+.parties > div { flex: 1; border: 1px solid #444; padding: 2mm 3mm; }
+.lbl { font-size: 8.5pt; text-transform: uppercase; color: #444; }
+table { width: 100%; border-collapse: collapse; margin: 3mm 0; }
+td, th { border: 1px solid #444; padding: 1.6mm 2mm; text-align: left; vertical-align: top; }
+th { background: #eee; } td.k { font-weight: bold; background: #f6f6f6; }
+.num { text-align: right; white-space: nowrap; }
+.clause { margin: 2.5mm 0; }
+.sign { margin-top: 12mm; width: 45%; border-top: 1px solid #111; padding-top: 1.5mm; font-size: 9.5pt; }
+.footer { margin-top: 10mm; text-align: center; font-size: 7.5pt; color: #666; }
+</style></head>
+<body>
+<div class="head">
+  <div><div class="co">$seller_name_upper</div><div class="addr">$seller_address</div></div>
+  <div class="meta">Invoice No.: <b>$invoice_number</b><br>Invoice date: $invoice_date<br>Contract ref.: $contract_reference</div>
+</div>
+<h1>COMMERCIAL INVOICE</h1>
+<div class="parties">
+  <div><div class="lbl">Seller / Exporter</div><b>$seller_name</b><br>$seller_address</div>
+  <div><div class="lbl">Buyer / Consignee</div><b>$buyer_name</b><br>$buyer_address</div>
+</div>
+<table>
+  <tr><td class="k">Vessel</td><td>MV "$vessel"</td><td class="k">Bill of Lading No.</td><td>$bl_number</td></tr>
+  <tr><td class="k">Port of loading</td><td>$load_port</td><td class="k">Bill of Lading date</td><td>$bl_date</td></tr>
+  <tr><td class="k">Port of discharge</td><td>$discharge_port</td><td class="k">Terms of delivery</td><td>$incoterm_text (Incoterms® 2020)</td></tr>
+</table>
+<table>
+  <tr><th>Description of goods</th><th class="num">Quantity ($unit_plural)</th><th class="num">Unit price ($currency/$unit_single)</th><th class="num">Amount ($currency)</th></tr>
+  <tr><td>$commodity_desc</td><td class="num">$quantity</td><td class="num">$unit_price</td><td class="num">$total</td></tr>
+  <tr><td colspan="3" class="num"><b>TOTAL AMOUNT DUE</b></td><td class="num"><b>$currency $total</b></td></tr>
+</table>
+<div class="clause"><b>Quantity basis:</b> Net weight as per certificate of weight issued by independent surveyor at loading port.</div>
+<div class="clause"><b>Payment terms:</b> 100% cash against documents (CAD), by telegraphic transfer.</div>
+<div class="sign">$seller_name<br>Authorized signature</div>
+<div class="footer">SAMPLE DOCUMENT – fictional parties and data, created for software testing only.</div>
+</body></html>

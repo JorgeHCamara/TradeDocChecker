@@ -49,7 +49,26 @@ First live runs, Claude Opus 5.5 at effort `medium`, on the two initial test cas
 
 About $0.07 per trade. The two extractions run in parallel, so a full check takes
 roughly as long as the slower one. These two cases are clean and simple; the full
-test set will add harder variations.
+test set below adds harder variations.
+
+## Test set
+
+30 cases (`data/cases/`, listed in [`data/cases/INDEX.md`](data/cases/INDEX.md)):
+7 trades in soybeans and corn, 3 contract layouts and 3 invoice layouts.
+
+- **12 clean cases** that must pass. They vary the format: tolerance written as
+  "+/- 10% MOLBO", dates as ISO, dd.mm.yyyy, "May 12, 2026" or "30-Oct-2026",
+  Brazilian number format (65.410,750), quantities in bushels, a quantity exactly
+  at the tolerance limit, company names printed differently.
+- **16 cases with planted problems:** quantity over or under tolerance, wrong price,
+  wrong total, wrong buyer, wrong contract reference, wrong Incoterm or port,
+  wrong commodity, B/L date outside the shipment period, a contract with no
+  tolerance clause, an invoice with no B/L date, and one case with two errors.
+
+The expected check results are written by hand in each case definition, never
+computed with the checks code, so a bug in the checks can't leak into the answer
+keys. The generated cases found one on their first run: "Seoha Grain Corporation"
+and "SEOHA GRAIN CORP." were treated as different companies.
 
 ## Project layout
 
@@ -60,7 +79,9 @@ checker/sources.py      Checks each extracted value's source quote is really in 
 checker/checks.py       The nine comparison checks (plain code)
 checker/pipeline.py     Runs the whole check for one trade and prints the report
 data/cases/case_NNN/    One test case: contract.pdf, invoice.pdf, expected.json (the answer key)
-data/templates/         HTML sources used to generate the test PDFs
+data/cases/INDEX.md     What each test case tests
+data/templates/         HTML layouts used to generate the test PDFs
+scripts/generate_cases.py  Generates case_003 onward (PDFs + answer keys)
 tests/                  Tests that run without API calls
 ```
 

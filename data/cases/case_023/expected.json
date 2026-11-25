@@ -1,0 +1,47 @@
+{
+  "case_id": "case_023",
+  "description": "Two errors: price USD 248.00 vs 246.00, and 55,600 MT over the maximum of 55,000 MT.",
+  "contract": {
+    "contract_number": "RCA-26-0951",
+    "contract_date": "2026-08-28",
+    "seller": "Rio Claro Agroexport S.A.",
+    "buyer": "Seoha Grain Corporation",
+    "commodity": "corn",
+    "quantity": 50000,
+    "quantity_unit": "MT",
+    "quantity_tolerance_percent": 10,
+    "unit_price": 246.0,
+    "currency": "USD",
+    "incoterm": "CFR",
+    "incoterm_place": "Busan",
+    "shipment_start": "2026-10-15",
+    "shipment_end": "2026-11-15"
+  },
+  "invoice": {
+    "invoice_number": "RCA/INV/26/0121",
+    "invoice_date": "2026-10-25",
+    "contract_reference": "RCA-26-0951",
+    "seller": "Rio Claro Agroexport S.A.",
+    "buyer": "Seoha Grain Corporation",
+    "commodity": "corn",
+    "quantity": 55600,
+    "quantity_unit": "MT",
+    "unit_price": 248.0,
+    "currency": "USD",
+    "total_amount": 13788800.0,
+    "incoterm": "CFR",
+    "incoterm_place": "Busan",
+    "bill_of_lading_date": "2026-10-22"
+  },
+  "checks": {
+    "seller_matches": "PASS",
+    "buyer_matches": "PASS",
+    "commodity_matches": "PASS",
+    "contract_reference_matches": "PASS",
+    "unit_price_matches": "FAIL",
+    "quantity_within_tolerance": "FAIL",
+    "total_is_correct": "PASS",
+    "incoterm_matches": "PASS",
+    "bl_date_within_shipment_period": "PASS"
+  }
+}

@@ -34,7 +34,8 @@ class NeedsReview(Exception):
 
 # Legal-form words that don't distinguish one company from another.
 COMPANY_SUFFIXES = {
-    "ltda", "ltd", "limited", "pte", "plc", "inc", "llc", "corp", "co",
+    "ltda", "ltd", "limited", "pte", "plc", "inc", "incorporated", "llc",
+    "corp", "corporation", "co", "company",
     "sa", "ag", "gmbh", "bv", "nv", "srl", "spa", "eireli",
 }
 

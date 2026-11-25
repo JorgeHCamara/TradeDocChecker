@@ -1,0 +1,47 @@
+{
+  "case_id": "case_010",
+  "description": "29,150 MT is below the minimum of 29,400 MT (30,000 -2%).",
+  "contract": {
+    "contract_number": "PLN/S/2026/031",
+    "contract_date": "2026-01-20",
+    "seller": "Planura Commodities Ltda.",
+    "buyer": "Eastbridge Agri Trading Pte. Ltd.",
+    "commodity": "soybeans",
+    "quantity": 30000,
+    "quantity_unit": "MT",
+    "quantity_tolerance_percent": 2,
+    "unit_price": 405.25,
+    "currency": "USD",
+    "incoterm": "FOB",
+    "incoterm_place": "Rio Grande",
+    "shipment_start": "2026-03-01",
+    "shipment_end": "2026-03-31"
+  },
+  "invoice": {
+    "invoice_number": "PLN-FAT-2026-0108",
+    "invoice_date": "2026-03-25",
+    "contract_reference": "PLN/S/2026/031",
+    "seller": "Planura Commodities Ltda.",
+    "buyer": "Eastbridge Agri Trading Pte. Ltd.",
+    "commodity": "soybeans",
+    "quantity": 29150,
+    "quantity_unit": "MT",
+    "unit_price": 405.25,
+    "currency": "USD",
+    "total_amount": 11813037.5,
+    "incoterm": "FOB",
+    "incoterm_place": "Rio Grande",
+    "bill_of_lading_date": "2026-03-22"
+  },
+  "checks": {
+    "seller_matches": "PASS",
+    "buyer_matches": "PASS",
+    "commodity_matches": "PASS",
+    "contract_reference_matches": "PASS",
+    "unit_price_matches": "PASS",
+    "quantity_within_tolerance": "FAIL",
+    "total_is_correct": "PASS",
+    "incoterm_matches": "PASS",
+    "bl_date_within_shipment_period": "PASS"
+  }
+}

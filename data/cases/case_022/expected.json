@@ -1,0 +1,47 @@
+{
+  "case_id": "case_022",
+  "description": "Invoice in bushels; equals 64,100 MT, over the maximum of 63,000 MT.",
+  "contract": {
+    "contract_number": "CVG-SOY-2026-0302",
+    "contract_date": "2026-04-03",
+    "seller": "Cerrado Verde Grãos Ltda.",
+    "buyer": "Seoha Grain Corporation",
+    "commodity": "soybeans",
+    "quantity": 60000,
+    "quantity_unit": "MT",
+    "quantity_tolerance_percent": 5,
+    "unit_price": 409.8,
+    "currency": "USD",
+    "incoterm": "FOB",
+    "incoterm_place": "Itaqui",
+    "shipment_start": "2026-05-01",
+    "shipment_end": "2026-05-31"
+  },
+  "invoice": {
+    "invoice_number": "CVG-INV-2026-0120",
+    "invoice_date": "2026-06-01",
+    "contract_reference": "CVG-SOY-2026-0302",
+    "seller": "Cerrado Verde Grãos Ltda.",
+    "buyer": "Seoha Grain Corporation",
+    "commodity": "soybeans",
+    "quantity": 2355272.0,
+    "quantity_unit": "BU",
+    "unit_price": 11.1529,
+    "currency": "USD",
+    "total_amount": 26268113.09,
+    "incoterm": "FOB",
+    "incoterm_place": "Itaqui",
+    "bill_of_lading_date": "2026-05-29"
+  },
+  "checks": {
+    "seller_matches": "PASS",
+    "buyer_matches": "PASS",
+    "commodity_matches": "PASS",
+    "contract_reference_matches": "PASS",
+    "unit_price_matches": "PASS",
+    "quantity_within_tolerance": "FAIL",
+    "total_is_correct": "PASS",
+    "incoterm_matches": "PASS",
+    "bl_date_within_shipment_period": "PASS"
+  }
+}

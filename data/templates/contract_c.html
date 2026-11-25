@@ -1,0 +1,23 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Contract $contract_number</title>
+<style>
+@page { size: A4; margin: 22mm 22mm 22mm 22mm; }
+body { font-family: Georgia, "Times New Roman", serif; font-size: 10.5pt; color: #222; line-height: 1.55; }
+.letterhead { text-align: center; border-bottom: 1px solid #999; padding-bottom: 3mm; margin-bottom: 8mm; }
+.letterhead .n { font-size: 14pt; font-variant: small-caps; letter-spacing: 1px; } .letterhead .a { font-size: 8.5pt; color: #555; }
+.right { text-align: right; } p { text-align: justify; }
+.sign { margin-top: 14mm; } .footer { margin-top: 12mm; text-align: center; font-size: 7.5pt; color: #666; }
+</style></head>
+<body>
+<div class="letterhead"><div class="n">$seller_name</div><div class="a">$seller_address</div></div>
+<p class="right">$contract_date</p>
+<p>To:<br><b>$buyer_name</b><br>$buyer_address</p>
+<p><b>Our contract $contract_number</b></p>
+<p>Dear Sirs,</p>
+<p>We are pleased to confirm having sold to you $quantity_text of $commodity_desc, at $price_text, $incoterm_text (Incoterms 2020), for shipment between $shipment_start and $shipment_end.</p>
+<p>Quality: $quality_inline. Weights and quality final at loading port as per certificates of an independent surveyor appointed by Sellers.</p>
+<p>Payment: cash against documents, 100% of the invoice value, by telegraphic transfer to Sellers' account. $arbitration</p>
+<p>Kindly countersign and return this contract as your acceptance of the above terms.</p>
+<div class="sign">Yours faithfully,<br><br>$seller_name<br><br>Accepted: ____________________ for $buyer_name</div>
+<div class="footer">SAMPLE DOCUMENT – fictional parties and data, created for software testing only.</div>
+</body></html>

@@ -1,0 +1,48 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Sales Contract $contract_number</title>
+<style>
+@page { size: A4; margin: 18mm 16mm 20mm 16mm; }
+body { font-family: "Times New Roman", Times, serif; font-size: 10.5pt; color: #111; line-height: 1.35; }
+h1 { font-size: 15pt; text-align: center; margin: 0 0 2mm 0; }
+.sub { text-align: center; font-size: 10pt; margin-bottom: 6mm; }
+.head { display: flex; justify-content: space-between; border-bottom: 1.5px solid #111; padding-bottom: 3mm; margin-bottom: 5mm; }
+.co { font-weight: bold; font-size: 12pt; } .addr { font-size: 9pt; } .meta { text-align: right; font-size: 9.5pt; }
+.parties { display: flex; gap: 6mm; margin-bottom: 4mm; }
+.parties > div { flex: 1; border: 1px solid #444; padding: 2mm 3mm; }
+.lbl { font-size: 8.5pt; text-transform: uppercase; color: #444; }
+table { width: 100%; border-collapse: collapse; margin: 3mm 0; }
+td, th { border: 1px solid #444; padding: 1.6mm 2mm; text-align: left; }
+th { background: #eee; }
+.clause { margin: 2.5mm 0; } .clause b { display: inline-block; min-width: 34mm; }
+.sign { display: flex; gap: 12mm; margin-top: 12mm; }
+.sign > div { flex: 1; border-top: 1px solid #111; padding-top: 1.5mm; font-size: 9.5pt; }
+.footer { margin-top: 10mm; text-align: center; font-size: 7.5pt; color: #666; }
+</style></head>
+<body>
+<div class="head">
+  <div><div class="co">$seller_name_upper</div><div class="addr">$seller_address</div></div>
+  <div class="meta">Contract No.: <b>$contract_number</b><br>Date: $contract_date</div>
+</div>
+<h1>SALES CONTRACT</h1>
+<div class="sub">$commodity_short in Bulk – $incoterm</div>
+<div class="parties">
+  <div><div class="lbl">Seller</div><b>$seller_name</b><br>$seller_address</div>
+  <div><div class="lbl">Buyer</div><b>$buyer_name</b><br>$buyer_address</div>
+</div>
+<p>The Seller agrees to sell and the Buyer agrees to buy the goods described below on the following terms and conditions:</p>
+<div class="clause"><b>1. Commodity:</b> $commodity_desc.</div>
+<div class="clause"><b>2. Quality:</b> Sound, fair and merchantable, basis the following specifications:</div>
+<table><tr><th>Parameter</th><th>Specification</th></tr>$quality_rows</table>
+<div class="clause"><b>3. Quantity:</b> $quantity_text</div>
+<div class="clause"><b>4. Price:</b> $price_text</div>
+<div class="clause"><b>5. Delivery terms:</b> $incoterm_text (Incoterms® 2020).</div>
+<div class="clause"><b>6. Shipment period:</b> From $shipment_start to $shipment_end, both dates inclusive. Bill of Lading date to be considered proof of date of shipment.</div>
+<div class="clause"><b>7. Weight and quality:</b> Final at loading port as per certificates issued by a mutually agreed independent surveyor.</div>
+<div class="clause"><b>8. Payment:</b> 100% cash against documents (CAD), by telegraphic transfer within 5 (five) banking days after presentation of commercial invoice, full set of clean on board Bills of Lading, certificates of weight and quality, phytosanitary certificate and certificate of origin.</div>
+<div class="clause"><b>9. Arbitration:</b> $arbitration</div>
+<div class="sign">
+  <div>For and on behalf of the <b>Seller</b><br>$seller_name</div>
+  <div>For and on behalf of the <b>Buyer</b><br>$buyer_name</div>
+</div>
+<div class="footer">SAMPLE DOCUMENT – fictional parties and data, created for software testing only.</div>
+</body></html>

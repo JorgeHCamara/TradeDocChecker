@@ -1,0 +1,34 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Commercial Invoice $invoice_number</title>
+<style>
+@page { size: A4; margin: 15mm 15mm 18mm 15mm; }
+body { font-family: "Courier New", Courier, monospace; font-size: 9.5pt; color: #111; line-height: 1.35; }
+h1 { font-size: 13pt; text-align: center; border: 2px solid #111; padding: 2mm; margin: 0 0 5mm 0; }
+table { width: 100%; border-collapse: collapse; }
+td { border: 1px solid #777; padding: 1.4mm 2mm; vertical-align: top; }
+td.k { width: 34%; background: #f0f0f0; }
+.num { white-space: nowrap; }
+.footer { margin-top: 10mm; text-align: center; font-size: 7.5pt; color: #666; }
+</style></head>
+<body>
+<h1>COMMERCIAL INVOICE / FATURA COMERCIAL</h1>
+<table>
+  <tr><td class="k">Invoice No. / Fatura nº</td><td>$invoice_number</td></tr>
+  <tr><td class="k">Date of issue / Data</td><td>$invoice_date</td></tr>
+  <tr><td class="k">Contract / Contrato</td><td>$contract_reference</td></tr>
+  <tr><td class="k">Exporter / Exportador</td><td>$seller_name<br>$seller_address</td></tr>
+  <tr><td class="k">Importer / Importador</td><td>$buyer_name<br>$buyer_address</td></tr>
+  <tr><td class="k">Product / Produto</td><td>$commodity_desc</td></tr>
+  <tr><td class="k">Net weight ($unit_plural) / Peso líquido</td><td class="num">$quantity</td></tr>
+  <tr><td class="k">Unit value ($currency/$unit_single)</td><td class="num">$unit_price</td></tr>
+  <tr><td class="k">Total value ($currency) / Valor total</td><td class="num">$total</td></tr>
+  <tr><td class="k">Incoterm</td><td>$incoterm_text – Incoterms 2020</td></tr>
+  <tr><td class="k">Vessel / Navio</td><td>$vessel</td></tr>
+  <tr><td class="k">Port of loading / Porto de embarque</td><td>$load_port</td></tr>
+  <tr><td class="k">Port of discharge / Porto de destino</td><td>$discharge_port</td></tr>
+  <tr><td class="k">B/L No.</td><td>$bl_number</td></tr>
+  $bl_date_row
+  <tr><td class="k">Payment / Pagamento</td><td>Cash against documents</td></tr>
+</table>
+<div class="footer">SAMPLE DOCUMENT – fictional parties and data, created for software testing only.</div>
+</body></html>

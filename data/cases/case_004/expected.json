@@ -1,0 +1,47 @@
+{
+  "case_id": "case_004",
+  "description": "61,200 MT exceeds the maximum of 60,500 MT (55,000 +10%).",
+  "contract": {
+    "contract_number": "RCA-26-0412",
+    "contract_date": "2026-04-02",
+    "seller": "Rio Claro Agroexport S.A.",
+    "buyer": "Seoha Grain Corporation",
+    "commodity": "soybeans",
+    "quantity": 55000,
+    "quantity_unit": "MT",
+    "quantity_tolerance_percent": 10,
+    "unit_price": 448.0,
+    "currency": "USD",
+    "incoterm": "CFR",
+    "incoterm_place": "Busan",
+    "shipment_start": "2026-05-15",
+    "shipment_end": "2026-06-15"
+  },
+  "invoice": {
+    "invoice_number": "RCA/INV/26/0102",
+    "invoice_date": "2026-06-12",
+    "contract_reference": "RCA-26-0412",
+    "seller": "Rio Claro Agroexport S.A.",
+    "buyer": "Seoha Grain Corporation",
+    "commodity": "soybeans",
+    "quantity": 61200,
+    "quantity_unit": "MT",
+    "unit_price": 448.0,
+    "currency": "USD",
+    "total_amount": 27417600.0,
+    "incoterm": "CFR",
+    "incoterm_place": "Busan",
+    "bill_of_lading_date": "2026-06-09"
+  },
+  "checks": {
+    "seller_matches": "PASS",
+    "buyer_matches": "PASS",
+    "commodity_matches": "PASS",
+    "contract_reference_matches": "PASS",
+    "unit_price_matches": "PASS",
+    "quantity_within_tolerance": "FAIL",
+    "total_is_correct": "PASS",
+    "incoterm_matches": "PASS",
+    "bl_date_within_shipment_period": "PASS"
+  }
+}
