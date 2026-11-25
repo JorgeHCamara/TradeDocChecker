@@ -1,0 +1,16 @@
+{
+  "invoice_number": {"value": "CVG-INV-2026-0388", "source": "CVG-INV-2026-0388"},
+  "invoice_date": {"value": "2026-04-22", "source": "22 April 2026"},
+  "contract_reference": {"value": "CVG-SOY-2026-0147", "source": "CVG-SOY-2026-0147"},
+  "seller": {"value": "Cerrado Verde Grãos Ltda.", "source": "Cerrado Verde Grãos Ltda."},
+  "buyer": {"value": "Eastbridge Agri Trading Pte. Ltd.", "source": "Eastbridge Agri Trading Pte. Ltd."},
+  "commodity": {"value": "soybeans", "source": "Brazilian Yellow Soybeans, GMO, crop"},
+  "quantity": {"value": 63800.0, "source": "63,800.000"},
+  "quantity_unit": {"value": "MT", "source": "Quantity (MT)"},
+  "unit_price": {"value": 412.5, "source": "412.50"},
+  "currency": {"value": "USD", "source": "Unit price (USD/MT)"},
+  "total_amount": {"value": 26317500.0, "source": "USD 26,317,500.00"},
+  "incoterm": {"value": "FOB", "source": "FOB Paranaguá"},
+  "incoterm_place": {"value": "Paranaguá", "source": "FOB Paranaguá"},
+  "bill_of_lading_date": {"value": "2026-04-20", "source": "20 April 2026"}
+}

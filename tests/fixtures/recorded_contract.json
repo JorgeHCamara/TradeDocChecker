@@ -1,0 +1,16 @@
+{
+  "contract_number": {"value": "CVG-SOY-2026-0147", "source": "CVG-SOY-2026-0147"},
+  "contract_date": {"value": "2026-03-14", "source": "14 March 2026"},
+  "seller": {"value": "Cerrado Verde Grãos Ltda.", "source": "Cerrado Verde Grãos Ltda."},
+  "buyer": {"value": "Eastbridge Agri Trading Pte. Ltd.", "source": "Eastbridge Agri Trading Pte. Ltd."},
+  "commodity": {"value": "soybeans", "source": "Brazilian Yellow Soybeans, GMO, crop 2025/2026, in bulk."},
+  "quantity": {"value": 60000.0, "source": "60,000"},
+  "quantity_unit": {"value": "MT", "source": "metric tons"},
+  "quantity_tolerance_percent": {"value": 5.0, "source": "5% more or less"},
+  "unit_price": {"value": 412.5, "source": "USD 412.50"},
+  "currency": {"value": "USD", "source": "USD"},
+  "incoterm": {"value": "FOB", "source": "FOB Paranaguá, Brazil (Incoterms® 2020)"},
+  "incoterm_place": {"value": "Paranaguá, Brazil", "source": "Paranaguá, Brazil"},
+  "shipment_start": {"value": "2026-04-01", "source": "01 April 2026"},
+  "shipment_end": {"value": "2026-04-30", "source": "30 April 2026"}
+}
