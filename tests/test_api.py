@@ -22,7 +22,7 @@ def api():
 
 def test_list_cases(api):
     cases = api.get("/api/cases").json()
-    assert len(cases) == 30
+    assert len(cases) == len([p for p in CASE_002.parent.iterdir() if p.is_dir()])
     assert cases[1] == {
         "id": "case_002",
         "description": cases[1]["description"],

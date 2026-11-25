@@ -40,7 +40,7 @@ Result: ISSUES FOUND  (1 fail, 0 review, 8 pass)
 
 ## Results
 
-Eval on all 30 test cases (see [Eval](#eval)):
+Eval on the 30 text-PDF test cases, case_001 to case_030 (see [Eval](#eval)):
 
 | Run | Model | Effort | Fields correct | Problems caught | Missed | False alarms | Cost / trade | Full eval | Median time |
 |---|---|---|---|---|---|---|---|---|---|
@@ -71,7 +71,7 @@ common pattern is to keep Haiku as the default and send only uncertain trades
 
 ## Test set
 
-30 cases (`data/cases/`, listed in [`data/cases/INDEX.md`](data/cases/INDEX.md)):
+36 cases (`data/cases/`, listed in [`data/cases/INDEX.md`](data/cases/INDEX.md)):
 7 trades in soybeans and corn, 3 contract layouts and 3 invoice layouts.
 
 - **12 clean cases** that must pass. They vary the format: tolerance written as
@@ -82,6 +82,11 @@ common pattern is to keep Haiku as the default and send only uncertain trades
   wrong total, wrong buyer, wrong contract reference, wrong Incoterm or port,
   wrong commodity, B/L date outside the shipment period, a contract with no
   tolerance clause, an invoice with no B/L date, and one case with two errors.
+- **6 scanned invoices** (case_031 to case_036, tagged `scanned`): image-only PDFs
+  with no text layer, at three scan qualities: good (200 dpi), fair (150 dpi,
+  tilted, JPEG) and poor (110 dpi, blurred, heavy compression). 3 are clean and 3
+  have a planted numeric error (quantity, price, total), the kind of value a bad
+  scan is most likely to garble.
 
 The expected check results are written by hand in each case definition, never
 computed with the checks code, so a bug in the checks can't leak into the answer
@@ -93,9 +98,9 @@ and "SEOHA GRAIN CORP." were treated as different companies.
 Real trade documents are confidential, so the test set is synthetic: realistic
 trade terms with problems planted on purpose. That is a sound way to start, and
 synthetic cases stay useful for rare edge cases and as regression tests for bugs
-already found. But they only test the situations someone thought of. They are
-all digitally generated, with no scans, stamps, handwritten corrections,
-multi-page annexes or contract addenda.
+already found. But they only test the situations someone thought of. Apart from
+six simulated scans they are digitally generated, with no real scans, stamps,
+handwritten corrections, multi-page annexes or contract addenda.
 
 In a real deployment, the next steps would be:
 
@@ -151,7 +156,7 @@ python -m checker.extract data/cases/case_001/invoice.pdf invoice --model claude
 
 ## Web app
 
-A React frontend: pick one of the 30 test cases (its result is shown next to the
+A React frontend: pick one of the test cases (its result is shown next to the
 expected answer) or upload your own contract and invoice PDFs. The report shows
 every check with its explanation, and every extracted field with the text it was
 read from; values whose source couldn't be found in the PDF are flagged.
@@ -178,14 +183,16 @@ every extracted field and every check result with the answer keys.
 
 ```bash
 python -m checker.evaluate --quick     # 6 hard cases, about $0.01: use while iterating
-python -m checker.evaluate             # all 30 cases, about $0.05 on the default model
+python -m checker.evaluate             # all cases, about $0.002 per case on the default model
+python -m checker.evaluate --tag scanned   # only the scanned invoices
 python -m checker.evaluate --model claude-opus-5-5 --effort medium   # about $1.70
 python -m checker.evaluate --rescore results/<run folder>   # re-score saved outputs, free
 ```
 
 Each run saves its settings (model, effort, a fingerprint of the prompt and
 schemas, git commit), the raw output of every case and the scorecard to
-`results/`. The most important number is **problems missed**: a planted
+`results/`. When the cases have different tags (`text_pdf`, `scanned`), the
+scorecard also shows each group separately. The most important number is **problems missed**: a planted
 problem that came back PASS. A false alarm costs an analyst a few minutes; a
 missed problem can mean paying for goods outside the contract.
 

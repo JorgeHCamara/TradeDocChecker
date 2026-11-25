@@ -15,7 +15,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["httpx", "pytest"]
-generate = ["playwright"]
+generate = ["pillow", "playwright", "pypdfium2"]
 
 [build-system]
 requires = ["setuptools>=68"]

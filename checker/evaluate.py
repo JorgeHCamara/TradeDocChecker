@@ -1,8 +1,9 @@
 """Eval: run the real system on the test cases and score it against the answer keys.
 
-    python -m checker.evaluate                       # all 30 cases (about $0.05 on the default, Claude Haiku 5.5)
+    python -m checker.evaluate                       # all cases (about $0.002 per case on the default, Claude Haiku 5.5)
     python -m checker.evaluate --quick               # 6 hard cases (about $0.01)
     python -m checker.evaluate --cases case_007 case_013
+    python -m checker.evaluate --tag scanned                # only cases with that tag
     python -m checker.evaluate --model claude-opus-5-5 --effort medium   # about $1.70
     python -m checker.evaluate --rescore results/<run folder>   # score saved outputs again: no API calls
 
@@ -94,27 +95,20 @@ def score_case(expected: dict, report: dict) -> dict:
     }
 
 
-def score_run(run_dir: Path) -> dict:
-    """Score every saved case output in a run folder. Makes no API calls."""
-    per_case, errors, costs, seconds = {}, {}, [], []
-    for path in sorted((run_dir / "cases").glob("case_*.json")):
-        output = json.loads(path.read_text(encoding="utf-8"))
-        case_id = output["case_id"]
-        if output["error"]:
-            errors[case_id] = output["error"]
-            continue
-        expected = json.loads((CASES_DIR / case_id / "expected.json").read_text(encoding="utf-8"))
-        per_case[case_id] = score_case(expected, output["report"])
-        if output["report"]["cost_usd"] is not None:
-            costs.append(output["report"]["cost_usd"])
-        seconds.append(output["report"]["seconds"])
+def case_tags(case_id: str) -> list[str]:
+    """A case's tags from its answer key; cases without tags are plain text PDFs."""
+    expected = json.loads((CASES_DIR / case_id / "expected.json").read_text(encoding="utf-8"))
+    return expected.get("tags") or ["text_pdf"]
 
-    # Planted problems: checks whose expected result is FAIL or REVIEW.
+
+def aggregate(per_case: dict[str, dict], costs: dict[str, float], seconds: dict[str, float]) -> dict:
+    """Add up the per-case scores of a group of cases."""
     caught, flagged_differently, missed = [], [], []
     false_alarms, extra_reviews = [], []
     by_field: dict[str, list[int]] = {}
     for case_id, s in per_case.items():
         diffs = {d["check"]: d for d in s["check_diffs"]}
+        # Planted problems: checks whose expected result is FAIL or REVIEW.
         for name in s["problems"]:
             if name not in diffs:
                 caught.append(f"{case_id}.{name}")
@@ -135,9 +129,10 @@ def score_run(run_dir: Path) -> dict:
                 counts[0] += key not in wrong
                 counts[1] += 1
 
+    case_costs = [costs[c] for c in per_case if c in costs]
+    case_seconds = [seconds[c] for c in per_case if c in seconds]
     return {
         "cases_run": len(per_case),
-        "errors": errors,
         "cases_fully_correct": sum(1 for s in per_case.values() if not s["check_diffs"] and not s["wrong_fields"]),
         "fields": {
             "correct": sum(s["fields_total"] - len(s["wrong_fields"]) for s in per_case.values()),
@@ -160,10 +155,37 @@ def score_run(run_dir: Path) -> dict:
             "false_alarms": false_alarms,
             "extra_reviews": extra_reviews,
         },
-        "cost_usd_total": round(sum(costs), 4) if costs else None,
-        "cost_usd_per_trade": round(sum(costs) / len(costs), 4) if costs else None,
-        "seconds_median": statistics.median(seconds) if seconds else None,
-        "seconds_max": max(seconds) if seconds else None,
+        "cost_usd_total": round(sum(case_costs), 4) if case_costs else None,
+        "cost_usd_per_trade": round(sum(case_costs) / len(case_costs), 4) if case_costs else None,
+        "seconds_median": statistics.median(case_seconds) if case_seconds else None,
+        "seconds_max": max(case_seconds) if case_seconds else None,
+    }
+
+
+def score_run(run_dir: Path) -> dict:
+    """Score every saved case output in a run folder, overall and per tag
+    (e.g. text_pdf vs scanned). Makes no API calls."""
+    per_case, errors, costs, seconds = {}, {}, {}, {}
+    for path in sorted((run_dir / "cases").glob("case_*.json")):
+        output = json.loads(path.read_text(encoding="utf-8"))
+        case_id = output["case_id"]
+        if output["error"]:
+            errors[case_id] = output["error"]
+            continue
+        expected = json.loads((CASES_DIR / case_id / "expected.json").read_text(encoding="utf-8"))
+        per_case[case_id] = score_case(expected, output["report"])
+        if output["report"]["cost_usd"] is not None:
+            costs[case_id] = output["report"]["cost_usd"]
+        seconds[case_id] = output["report"]["seconds"]
+
+    groups: dict[str, dict] = {}
+    for case_id, s in per_case.items():
+        for tag in case_tags(case_id):
+            groups.setdefault(tag, {})[case_id] = s
+    return {
+        **aggregate(per_case, costs, seconds),
+        "errors": errors,
+        "by_tag": {tag: aggregate(group, costs, seconds) for tag, group in sorted(groups.items())},
     }
 
 
@@ -199,6 +221,17 @@ def format_scorecard(scores: dict, config: dict) -> str:
     cost = f"${scores['cost_usd_per_trade']:.3f} per trade, ${scores['cost_usd_total']:.2f} total" if scores["cost_usd_total"] is not None else "cost unknown"
     if scores["seconds_median"] is not None:
         lines.append(f"Cost  {cost}    Time  median {scores['seconds_median']:.1f}s, slowest {scores['seconds_max']:.1f}s")
+
+    if len(scores["by_tag"]) > 1:
+        lines += ["", "By tag              cases  fields      quotes      caught  missed  false alarms  extra reviews"]
+        for tag, t in scores["by_tag"].items():
+            tc = t["checks"]
+            lines.append(
+                f"  {tag:<17} {t['cases_run']:>5}  {t['fields']['correct']:>4}/{t['fields']['total']:<5}  "
+                f"{t['sources']['verified']:>4}/{t['sources']['total']:<5}  "
+                f"{tc['problems_caught']:>2}/{tc['problems_total']:<3}  {len(tc['problems_missed']):>6}  "
+                f"{len(tc['false_alarms']):>12}  {len(tc['extra_reviews']):>13}"
+            )
 
     details = []
     for d in c["problems_missed"]:
@@ -307,6 +340,7 @@ def main() -> int:
     parser.add_argument("--effort", default=DEFAULT_EFFORT, choices=["low", "medium", "high"])
     parser.add_argument("--quick", action="store_true", help=f"only the {len(QUICK_CASES)} hard cases")
     parser.add_argument("--cases", nargs="+", metavar="CASE_ID", help="only these cases")
+    parser.add_argument("--tag", help="only cases with this tag, e.g. scanned or text_pdf")
     parser.add_argument("--rescore", type=Path, metavar="RUN_DIR", help="score a saved run again (no API calls)")
     parser.add_argument("--workers", type=int, default=3, help="cases run at the same time (default 3)")
     args = parser.parse_args()
@@ -317,6 +351,10 @@ def main() -> int:
 
     all_cases = sorted(p.name for p in CASES_DIR.iterdir() if p.is_dir())
     case_ids = args.cases or (QUICK_CASES if args.quick else all_cases)
+    if args.tag:
+        case_ids = [c for c in case_ids if args.tag in case_tags(c)]
+        if not case_ids:
+            parser.error(f"no cases have the tag {args.tag!r}")
     unknown = set(case_ids) - set(all_cases)
     if unknown:
         parser.error(f"unknown case(s): {', '.join(sorted(unknown))}")
@@ -324,7 +362,11 @@ def main() -> int:
     print(f"Running {len(case_ids)} cases on {args.model} (effort {args.effort}). This makes real API calls.\n")
     try:
         run_dir = run_eval(
-            case_ids, args.model, args.effort, label="_quick" if args.quick else "", workers=args.workers
+            case_ids,
+            args.model,
+            args.effort,
+            label=f"_{args.tag}" if args.tag else "_quick" if args.quick else "",
+            workers=args.workers,
         )
     except anthropic.AuthenticationError:
         print("API key rejected. Check ANTHROPIC_API_KEY in your .env file.", file=sys.stderr)

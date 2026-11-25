@@ -1,0 +1,51 @@
+{
+  "case_id": "case_031",
+  "description": "Clean. Scanned invoice, good quality (200 dpi).",
+  "tags": [
+    "scanned",
+    "scan_good"
+  ],
+  "contract": {
+    "contract_number": "CVG-CRN-2026-0233",
+    "contract_date": "2026-07-18",
+    "seller": "Cerrado Verde Grãos Ltda.",
+    "buyer": "Eastbridge Agri Trading Pte. Ltd.",
+    "commodity": "corn",
+    "quantity": 66000,
+    "quantity_unit": "MT",
+    "quantity_tolerance_percent": 5,
+    "unit_price": 212.75,
+    "currency": "USD",
+    "incoterm": "FOB",
+    "incoterm_place": "Santos",
+    "shipment_start": "2026-09-01",
+    "shipment_end": "2026-09-30"
+  },
+  "invoice": {
+    "invoice_number": "CVG-INV-2026-0129",
+    "invoice_date": "2026-09-19",
+    "contract_reference": "CVG-CRN-2026-0233",
+    "seller": "Cerrado Verde Grãos Ltda.",
+    "buyer": "Eastbridge Agri Trading Pte. Ltd.",
+    "commodity": "corn",
+    "quantity": 64880.25,
+    "quantity_unit": "MT",
+    "unit_price": 212.75,
+    "currency": "USD",
+    "total_amount": 13803273.19,
+    "incoterm": "FOB",
+    "incoterm_place": "Santos",
+    "bill_of_lading_date": "2026-09-16"
+  },
+  "checks": {
+    "seller_matches": "PASS",
+    "buyer_matches": "PASS",
+    "commodity_matches": "PASS",
+    "contract_reference_matches": "PASS",
+    "unit_price_matches": "PASS",
+    "quantity_within_tolerance": "PASS",
+    "total_is_correct": "PASS",
+    "incoterm_matches": "PASS",
+    "bl_date_within_shipment_period": "PASS"
+  }
+}

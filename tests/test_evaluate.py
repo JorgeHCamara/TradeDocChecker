@@ -148,3 +148,15 @@ def test_run_eval_saves_outputs_and_rescore_matches(tmp_path):
 
     # Rescoring the saved outputs gives the same result, with no API calls.
     assert write_scores(run_dir) + "\n" == scorecard
+
+
+def test_scores_are_broken_down_by_tag(tmp_path):
+    scanned = perfect_output("case_034")  # scanned invoice, quantity over tolerance
+    set_check(scanned, "quantity_within_tolerance", "REVIEW")
+    s = score_run(save_run(tmp_path, [perfect_output("case_001"), scanned]))
+
+    assert set(s["by_tag"]) == {"text_pdf", "scanned", "scan_fair"}
+    assert s["by_tag"]["text_pdf"]["cases_run"] == 1
+    assert s["by_tag"]["scanned"]["checks"]["problems_caught"] == 0
+    assert len(s["by_tag"]["scanned"]["checks"]["problems_flagged_differently"]) == 1
+    assert s["by_tag"]["text_pdf"]["checks"]["problems_flagged_differently"] == []
