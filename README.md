@@ -42,17 +42,32 @@ Result: ISSUES FOUND  (1 fail, 0 review, 8 pass)
 
 Eval on all 30 test cases (see [Eval](#eval)):
 
-| Run | Model | Effort | Fields correct | Problems caught | Missed | False alarms | Cost / trade | Median time |
-|---|---|---|---|---|---|---|---|---|
-| Baseline | Claude Opus 5.5 | medium | 840/840 | 19/19 | 0 | 0 of 251 | $0.057 | 4.7 s |
+| Run | Model | Effort | Fields correct | Problems caught | Missed | False alarms | Cost / trade | Full eval | Median time |
+|---|---|---|---|---|---|---|---|---|---|
+| Baseline | Claude Opus 5.5 | medium | 840/840 | 19/19 | 0 | 0 of 251 | $0.057 | $1.72 | 4.7 s |
+| Cheaper (run 1) | Claude Haiku 5.5 | low | 840/840 | 19/19 | 0 | 0 of 251 | $0.002 | $0.05 | 4.3 s |
+| Cheaper (run 2) | Claude Haiku 5.5 | low | 840/840 | 19/19 | 0 | 0 of 251 | $0.002 | $0.05 | 4.2 s |
+| Cheaper (run 3) | Claude Haiku 5.5 | low | 840/840 | 19/19 | 0 | 0 of 251 | $0.002 | $0.05 | 4.0 s |
 
-Every field and every check matched the answer keys, including the three values
-that are absent from their documents: the model returned `null` for the two
-missing tolerance clauses and the missing B/L date instead of inventing them.
+Every field and every check matched the answer keys in every run, including the
+three values that are absent from their documents: both models returned `null`
+for the two missing tolerance clauses and the missing B/L date instead of
+inventing them.
 
-A perfect score also means this test set no longer separates good settings from
-better ones. The next experiments therefore test cheaper and faster settings
-against the same bar, and harder documents (see [About the test data](#about-the-test-data)).
+**Decision: Claude Haiku 5.5 at low effort is the default.** It matched Claude
+Opus 5.5 in three runs out of three at about 1/35th of the cost: roughly $20
+instead of $570 for 10,000 trades. Claude Sonnet 5.5 and lower-effort Opus runs
+were skipped: they cost more than Haiku, and Haiku already scores perfectly, so
+their results could not change the decision. Claude Opus 5.5 is still available
+with `--model claude-opus-5-5`.
+
+**Limit of this result:** both models scored 100%, so this test set cannot tell
+them apart. The claim is "Haiku is as good as Opus on these documents", not
+"Haiku is as good as Opus". The next step is harder documents (scans, stamps,
+contract addenda; see [About the test data](#about-the-test-data)), which is
+where a cheaper model would be expected to fall behind first. If it does, a
+common pattern is to keep Haiku as the default and send only uncertain trades
+(those that need review) to a stronger model.
 
 ## Test set
 
@@ -131,7 +146,7 @@ Extract the fields of one document:
 
 ```bash
 python -m checker.extract data/cases/case_001/contract.pdf contract
-python -m checker.extract data/cases/case_001/invoice.pdf invoice --model claude-haiku-5-5 --effort low
+python -m checker.extract data/cases/case_001/invoice.pdf invoice --model claude-opus-5-5 --effort medium
 ```
 
 ## Web app
@@ -162,9 +177,9 @@ system performs: it runs the test cases through the real Claude API and compares
 every extracted field and every check result with the answer keys.
 
 ```bash
-python -m checker.evaluate --quick     # 6 hard cases, about $0.40: use while iterating
-python -m checker.evaluate             # all 30 cases, about $2 on Claude Opus 5.5
-python -m checker.evaluate --model claude-haiku-5-5 --effort low
+python -m checker.evaluate --quick     # 6 hard cases, about $0.01: use while iterating
+python -m checker.evaluate             # all 30 cases, about $0.05 on the default model
+python -m checker.evaluate --model claude-opus-5-5 --effort medium   # about $1.70
 python -m checker.evaluate --rescore results/<run folder>   # re-score saved outputs, free
 ```
 

@@ -55,14 +55,14 @@ def test_request_contains_pdf_schema_and_settings():
     captured = {}
     client = fake_client(api_response(expected_contract_json()), captured)
 
-    extract(CASE / "contract.pdf", "contract", client=client, effort="low")
+    extract(CASE / "contract.pdf", "contract", client=client, model="claude-opus-5-5", effort="medium")
 
     body = captured["body"]
     document = body["messages"][0]["content"][0]
     assert document["type"] == "document"
     assert document["source"]["media_type"] == "application/pdf"
     assert body["model"] == "claude-opus-5-5"
-    assert body["output_config"]["effort"] == "low"
+    assert body["output_config"]["effort"] == "medium"
     assert body["output_config"]["format"]["type"] == "json_schema"
     assert "quantity_tolerance_percent" in json.dumps(body["output_config"]["format"]["schema"])
     assert body["fallbacks"] == "default"
@@ -115,3 +115,13 @@ def test_haiku_requests_have_no_fallback_setting():
     assert "server-side-fallback" not in captured["headers"].get("anthropic-beta", "")
     # 3000 input tokens at $0.10/M + 500 output tokens at $0.50/M
     assert result.cost_usd == pytest.approx(0.00055)
+
+
+def test_default_is_haiku_at_low_effort():
+    captured = {}
+    client = fake_client(api_response(expected_contract_json()), captured)
+
+    extract(CASE / "contract.pdf", "contract", client=client)
+
+    assert captured["body"]["model"] == "claude-haiku-5-5"
+    assert captured["body"]["output_config"]["effort"] == "low"

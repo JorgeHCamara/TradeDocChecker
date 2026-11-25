@@ -23,7 +23,11 @@ from pydantic import BaseModel, ValidationError
 
 from checker.schemas import ContractExtraction, InvoiceExtraction
 
-DEFAULT_MODEL = "claude-opus-5-5"
+# Chosen with the eval (README, "Results"): Claude Haiku 5.5 at low effort scored
+# the same as Claude Opus 5.5 at medium on all 30 cases, three runs in a row,
+# at about 1/35th of the cost. Use --model / --effort to try other settings.
+DEFAULT_MODEL = "claude-haiku-5-5"
+DEFAULT_EFFORT = "low"
 
 DocType = Literal["contract", "invoice"]
 SCHEMAS: dict[str, type[BaseModel]] = {
@@ -81,7 +85,7 @@ def extract(
     doc_type: DocType,
     client: anthropic.Anthropic | None = None,
     model: str = DEFAULT_MODEL,
-    effort: str = "medium",
+    effort: str = DEFAULT_EFFORT,
 ) -> ExtractionResult:
     """Extract the fields of one document. Raises ExtractionError if the
     response can't be used; API errors (bad key, network) are raised as-is."""
@@ -153,7 +157,7 @@ def main() -> int:
     parser.add_argument("pdf", type=Path)
     parser.add_argument("doc_type", choices=list(SCHEMAS))
     parser.add_argument("--model", default=DEFAULT_MODEL)
-    parser.add_argument("--effort", default="medium", choices=["low", "medium", "high"])
+    parser.add_argument("--effort", default=DEFAULT_EFFORT, choices=["low", "medium", "high"])
     args = parser.parse_args()
 
     try:

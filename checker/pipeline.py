@@ -18,7 +18,7 @@ from pathlib import Path
 import anthropic
 
 from checker.checks import CheckResult, run_checks
-from checker.extract import DEFAULT_MODEL, ExtractionError, ExtractionResult, extract
+from checker.extract import DEFAULT_EFFORT, DEFAULT_MODEL, ExtractionError, ExtractionResult, extract
 from checker.sources import pdf_text, unverified_fields
 
 
@@ -53,7 +53,7 @@ def check_trade(
     invoice_pdf: str | Path,
     client: anthropic.Anthropic | None = None,
     model: str = DEFAULT_MODEL,
-    effort: str = "medium",
+    effort: str = DEFAULT_EFFORT,
 ) -> TradeReport:
     client = client or anthropic.Anthropic(max_retries=4)
     started = time.perf_counter()
@@ -126,7 +126,7 @@ def main() -> int:
     parser.add_argument("--contract", type=Path)
     parser.add_argument("--invoice", type=Path)
     parser.add_argument("--model", default=DEFAULT_MODEL)
-    parser.add_argument("--effort", default="medium", choices=["low", "medium", "high"])
+    parser.add_argument("--effort", default=DEFAULT_EFFORT, choices=["low", "medium", "high"])
     args = parser.parse_args()
 
     if args.case_dir:

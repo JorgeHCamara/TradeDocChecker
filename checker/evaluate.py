@@ -1,9 +1,9 @@
 """Eval: run the real system on the test cases and score it against the answer keys.
 
-    python -m checker.evaluate                       # all 30 cases (about $2 on Claude Opus 5.5)
-    python -m checker.evaluate --quick               # 6 hard cases (about $0.40)
+    python -m checker.evaluate                       # all 30 cases (about $0.05 on the default, Claude Haiku 5.5)
+    python -m checker.evaluate --quick               # 6 hard cases (about $0.01)
     python -m checker.evaluate --cases case_007 case_013
-    python -m checker.evaluate --model claude-haiku-5-5 --effort low
+    python -m checker.evaluate --model claude-opus-5-5 --effort medium   # about $1.70
     python -m checker.evaluate --rescore results/<run folder>   # score saved outputs again: no API calls
 
 Every run is saved to results/<time>_<model>_<effort>/:
@@ -28,7 +28,7 @@ from pathlib import Path
 import anthropic
 
 from checker.checks import normalize_company, normalize_id, normalize_place
-from checker.extract import DEFAULT_MODEL, SYSTEM_PROMPT, ExtractionError
+from checker.extract import DEFAULT_EFFORT, DEFAULT_MODEL, SYSTEM_PROMPT, ExtractionError
 from checker.pipeline import check_trade, report_to_dict
 from checker.schemas import ContractExtraction, InvoiceExtraction
 
@@ -249,7 +249,7 @@ def run_case(case_id: str, client: anthropic.Anthropic, model: str, effort: str)
 def run_eval(
     case_ids: list[str],
     model: str = DEFAULT_MODEL,
-    effort: str = "medium",
+    effort: str = DEFAULT_EFFORT,
     client: anthropic.Anthropic | None = None,
     results_dir: Path = RESULTS_DIR,
     label: str = "",
@@ -304,7 +304,7 @@ def main() -> int:
     load_dotenv()
     parser = argparse.ArgumentParser(description="Run and score the eval on the test cases.")
     parser.add_argument("--model", default=DEFAULT_MODEL)
-    parser.add_argument("--effort", default="medium", choices=["low", "medium", "high"])
+    parser.add_argument("--effort", default=DEFAULT_EFFORT, choices=["low", "medium", "high"])
     parser.add_argument("--quick", action="store_true", help=f"only the {len(QUICK_CASES)} hard cases")
     parser.add_argument("--cases", nargs="+", metavar="CASE_ID", help="only these cases")
     parser.add_argument("--rescore", type=Path, metavar="RUN_DIR", help="score a saved run again (no API calls)")
