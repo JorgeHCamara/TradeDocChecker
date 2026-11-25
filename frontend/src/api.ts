@@ -23,6 +23,9 @@ export interface Report {
   model: string;
   cost_usd: number | null;
   seconds: number;
+  // How each document's text was read for the source check. A scan has no
+  // text layer: "ocr" = read with OCR, "none" = OCR not installed on the server.
+  text_method: Record<"contract" | "invoice", "pdf_text" | "ocr" | "none">;
   // Only present when a test case was checked:
   expected?: { description: string; checks: Record<string, Status> };
 }

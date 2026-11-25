@@ -7,8 +7,8 @@ export function Report({ report }: { report: ReportData }) {
       <Verdict report={report} />
       <Checks report={report} />
       <section className="fields-grid">
-        <Fields title="Contract" fields={report.contract} />
-        <Fields title="Invoice" fields={report.invoice} />
+        <Fields title="Contract" fields={report.contract} textMethod={report.text_method.contract} />
+        <Fields title="Invoice" fields={report.invoice} textMethod={report.text_method.invoice} />
       </section>
     </>
   );
@@ -83,11 +83,20 @@ function Badge({ status }: { status: Status }) {
   return <span className={`badge ${status.toLowerCase()}`}>{status}</span>;
 }
 
-function Fields({ title, fields }: { title: string; fields: Record<string, Field> }) {
+const SCAN_NOTES = {
+  pdf_text: null,
+  ocr: "Scanned document: the quotes were checked against text read with OCR.",
+  none: "Scanned document: OCR isn't installed on the server, so the quotes couldn't be checked.",
+};
+
+function Fields(props: { title: string; fields: Record<string, Field>; textMethod: keyof typeof SCAN_NOTES }) {
+  const { title, fields, textMethod } = props;
+  const scanNote = SCAN_NOTES[textMethod];
   return (
     <section className="card">
       <h3>{title}: extracted fields</h3>
       <p className="hint">Each value with the exact text it was read from in the PDF.</p>
+      {scanNote && <p className={`scan-note ${textMethod}`}>{scanNote}</p>}
       <dl className="fields">
         {Object.entries(fields).map(([name, f]) => (
           <div key={name} className="field-row">

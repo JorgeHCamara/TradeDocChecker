@@ -22,6 +22,8 @@ invoice.pdf ──┘
    text it was read from.
 2. **Verify sources.** Each quote is searched for in the PDF's own text. A value
    whose quote isn't there may be made up, so checks that use it ask for human review.
+   Scanned PDFs have no text layer, so their text is read with OCR (optional, see
+   [Scanned documents](#scanned-documents)).
 3. **Check.** Nine comparisons in plain Python: parties, commodity, contract
    reference, unit price, quantity within tolerance (with MT/KG/LB/bushel conversion),
    invoice arithmetic, Incoterm, and B/L date within the shipment period.
@@ -111,6 +113,32 @@ In a real deployment, the next steps would be:
    sends to review, becomes a new test case. The test set then grows from real
    problems instead of guessed ones.
 
+## Scanned documents
+
+A scanned invoice is a picture of a page: the PDF has no text layer. The model
+can still read it, but the source-quote check needs the document's own text to
+compare against. Without OCR, every quote on a scan is unverified and every
+check that uses it goes to review: safe, but a person has to check everything.
+
+With the `ocr` extra installed, scans are read with
+[RapidOCR](https://github.com/RapidAI/RapidOCR) (pure `pip` install, no separate
+program), in parallel with the API calls. Quotes are then matched on letters and
+digits only, because OCR often drops spaces and accents ("22April 2026",
+"Paranagua"). Numbers stay strict: every digit must match, a number can't match
+inside a longer number, and a misread like 60,580 for 60,850 is rejected. A quote
+that wraps inside a table cell may be found in up to three pieces, since OCR reads
+a table row by row.
+
+Known limits:
+
+- On the poorest scans of the typewriter-font invoice layout (case_033, case_035),
+  OCR reads some 0s as 8s. Those values can't be verified, so their checks go to
+  review. Rendering pages larger for OCR made no difference (24/30 key values read
+  at 2×, 24/30 at 3×, 23/30 at 4×). The tests mark both cases as known failures.
+- If the model and the OCR misread the same digit the same way, the wrong value
+  would pass the source check. They read the page differently, so this is unlikely,
+  but possible.
+
 ## Project layout
 
 ```
@@ -136,6 +164,12 @@ python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
 cp .env.example .env             # then put your Anthropic API key in .env
+```
+
+To verify quotes on scanned PDFs, also install the OCR extra (about 200 MB):
+
+```bash
+pip install -e ".[dev,ocr]"
 ```
 
 ## Usage

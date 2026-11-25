@@ -16,6 +16,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["httpx", "pytest"]
 generate = ["pillow", "playwright", "pypdfium2"]
+# Reads scanned (image-only) PDFs for the source-quote check. About 200 MB.
+ocr = ["numpy", "pypdfium2", "rapidocr-onnxruntime"]
 
 [build-system]
 requires = ["setuptools>=68"]

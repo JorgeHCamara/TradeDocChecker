@@ -2,6 +2,9 @@
 
     extract both (in parallel) -> verify source quotes -> run checks -> report
 
+Scanned PDFs (no text layer) are read with OCR for the source-quote check,
+if the optional OCR extra is installed (see checker/sources.py).
+
 Run it on a test case folder:
     python -m checker.pipeline data/cases/case_002
 or on any two files:
@@ -19,7 +22,7 @@ import anthropic
 
 from checker.checks import CheckResult, run_checks
 from checker.extract import DEFAULT_EFFORT, DEFAULT_MODEL, ExtractionError, ExtractionResult, extract
-from checker.sources import pdf_text, unverified_fields
+from checker.sources import TextMethod, document_text, unverified_fields
 
 
 @dataclass
@@ -29,6 +32,8 @@ class TradeReport:
     unverified: set[str]  # e.g. {"invoice.quantity"}
     checks: list[CheckResult]
     seconds: float  # wall-clock time for the whole check
+    # How each document's text was read for the source check: "pdf_text", "ocr" or "none"
+    text_method: dict[str, TextMethod]
 
     @property
     def cost_usd(self) -> float | None:
@@ -58,18 +63,29 @@ def check_trade(
     client = client or anthropic.Anthropic(max_retries=4)
     started = time.perf_counter()
 
-    # The two extractions don't depend on each other, so run them at the same
-    # time: the total wait is the slower call, not the sum of both.
-    with ThreadPoolExecutor(max_workers=2) as pool:
+    # The two extractions and reading each document's own text (OCR for scans)
+    # don't depend on each other, so they all run at the same time: the total
+    # wait is the slowest job, not the sum.
+    with ThreadPoolExecutor(max_workers=4) as pool:
         contract_job = pool.submit(extract, contract_pdf, "contract", client, model, effort)
         invoice_job = pool.submit(extract, invoice_pdf, "invoice", client, model, effort)
+        contract_text_job = pool.submit(document_text, contract_pdf)
+        invoice_text_job = pool.submit(document_text, invoice_pdf)
         contract, invoice = contract_job.result(), invoice_job.result()
+        contract_text, invoice_text = contract_text_job.result(), invoice_text_job.result()
 
-    unverified = {f"contract.{f}" for f in unverified_fields(contract.data, pdf_text(contract_pdf))}
-    unverified |= {f"invoice.{f}" for f in unverified_fields(invoice.data, pdf_text(invoice_pdf))}
+    unverified = {f"contract.{f}" for f in unverified_fields(contract.data, contract_text.text)}
+    unverified |= {f"invoice.{f}" for f in unverified_fields(invoice.data, invoice_text.text)}
 
     checks = run_checks(contract.data, invoice.data, unverified)
-    return TradeReport(contract, invoice, unverified, checks, time.perf_counter() - started)
+    return TradeReport(
+        contract,
+        invoice,
+        unverified,
+        checks,
+        time.perf_counter() - started,
+        text_method={"contract": contract_text.method, "invoice": invoice_text.method},
+    )
 
 
 def report_to_dict(report: TradeReport) -> dict:
@@ -91,6 +107,7 @@ def report_to_dict(report: TradeReport) -> dict:
         "model": report.contract.model,
         "cost_usd": report.cost_usd,
         "seconds": round(report.seconds, 1),
+        "text_method": report.text_method,
     }
 
 
@@ -105,6 +122,14 @@ def format_report(report: TradeReport, title: str) -> str:
     for c in report.checks:
         lines.append(f"{c.status:<7} {c.name:<{width}}  {c.message}")
     lines.append("")
+    for doc, method in report.text_method.items():
+        if method == "ocr":
+            lines.append(f"The {doc} is a scan: its source quotes were checked against OCR text.")
+        elif method == "none":
+            lines.append(
+                f"The {doc} is a scan and OCR is not installed, so its source quotes could not be "
+                'checked (pip install -e ".[ocr]").'
+            )
     if report.unverified:
         lines.append(f"Unverified fields: {', '.join(sorted(report.unverified))}")
     lines.append(

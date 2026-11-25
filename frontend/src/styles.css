@@ -153,6 +153,8 @@ td.mismatch { color: var(--fail); font-weight: 600; white-space: nowrap; }
 .value { font-weight: 600; overflow-wrap: anywhere; }
 .source { color: var(--muted); font-size: 12.5px; font-style: italic; overflow-wrap: anywhere; }
 .source.unverified { color: var(--fail); font-weight: 600; font-style: normal; }
+.scan-note { font-size: 13px; margin: -4px 0 12px; padding: 6px 10px; border-radius: 6px; background: var(--review-bg); color: var(--review); }
+.scan-note.none { background: var(--fail-bg); color: var(--fail); }
 
 @media (max-width: 560px) {
   main { padding-top: 20px; }
