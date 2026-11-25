@@ -5,13 +5,16 @@ description = "Checks commodity trade invoices against their sales contracts usi
 requires-python = ">=3.11"
 dependencies = [
     "anthropic",
+    "fastapi",
     "pydantic>=2",
     "pypdf",
     "python-dotenv",
+    "python-multipart",
+    "uvicorn",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = ["httpx", "pytest"]
 generate = ["playwright"]
 
 [build-system]

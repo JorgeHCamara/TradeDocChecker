@@ -70,6 +70,24 @@ computed with the checks code, so a bug in the checks can't leak into the answer
 keys. The generated cases found one on their first run: "Seoha Grain Corporation"
 and "SEOHA GRAIN CORP." were treated as different companies.
 
+### About the test data
+
+Real trade documents are confidential, so the test set is synthetic: realistic
+trade terms with problems planted on purpose. That is a sound way to start, and
+synthetic cases stay useful for rare edge cases and as regression tests for bugs
+already found. But they only test the situations someone thought of. They are
+all digitally generated, with no scans, stamps, handwritten corrections,
+multi-page annexes or contract addenda.
+
+In a real deployment, the next steps would be:
+
+1. **Real documents:** an eval set of 50–200 real contracts and invoices
+   (anonymized where needed), with answers labeled by the customer's trade
+   operations team.
+2. **A feedback loop:** every result a user corrects, and every case the system
+   sends to review, becomes a new test case. The test set then grows from real
+   problems instead of guessed ones.
+
 ## Project layout
 
 ```
@@ -78,6 +96,8 @@ checker/extract.py      Sends one PDF to the Claude API and returns the extracte
 checker/sources.py      Checks each extracted value's source quote is really in the PDF
 checker/checks.py       The nine comparison checks (plain code)
 checker/pipeline.py     Runs the whole check for one trade and prints the report
+checker/api.py          HTTP API used by the frontend (FastAPI)
+frontend/               React + TypeScript web app (Vite)
 data/cases/case_NNN/    One test case: contract.pdf, invoice.pdf, expected.json (the answer key)
 data/cases/INDEX.md     What each test case tests
 data/templates/         HTML layouts used to generate the test PDFs
@@ -108,6 +128,27 @@ Extract the fields of one document:
 ```bash
 python -m checker.extract data/cases/case_001/contract.pdf contract
 python -m checker.extract data/cases/case_001/invoice.pdf invoice --model claude-haiku-5-5 --effort low
+```
+
+## Web app
+
+A React frontend: pick one of the 30 test cases (its result is shown next to the
+expected answer) or upload your own contract and invoice PDFs. The report shows
+every check with its explanation, and every extracted field with the text it was
+read from; values whose source couldn't be found in the PDF are flagged.
+
+Development (two terminals):
+
+```bash
+uvicorn checker.api:app --reload          # API on http://localhost:8000
+cd frontend && npm install && npm run dev  # app on http://localhost:5173
+```
+
+Production-style (one server): build the frontend once, and the API serves it.
+
+```bash
+cd frontend && npm install && npm run build && cd ..
+uvicorn checker.api:app                    # app and API on http://localhost:8000
 ```
 
 ## Running the tests

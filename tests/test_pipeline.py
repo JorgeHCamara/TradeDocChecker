@@ -4,45 +4,12 @@ through a fake API server. Also tests the source-quote check."""
 import json
 from pathlib import Path
 
-import anthropic
-import httpx2
-
 from checker.pipeline import check_trade, format_report
 from checker.schemas import InvoiceExtraction
 from checker.sources import pdf_text, unverified_fields
+from tests.fakes import recorded, replay_client
 
-ROOT = Path(__file__).parent.parent
-FIXTURES = Path(__file__).parent / "fixtures"
-CASE_002 = ROOT / "data" / "cases" / "case_002"
-
-
-def replay_client(contract_json: str, invoice_json: str) -> anthropic.Anthropic:
-    """Fake API that answers contract requests and invoice requests with recorded responses."""
-
-    def handler(request: httpx2.Request) -> httpx2.Response:
-        prompt = json.loads(request.content)["messages"][0]["content"][1]["text"]
-        text = contract_json if "contract" in prompt else invoice_json
-        return httpx2.Response(
-            200,
-            json={
-                "id": "msg_test",
-                "type": "message",
-                "role": "assistant",
-                "model": "claude-opus-5-5",
-                "content": [{"type": "text", "text": text}],
-                "stop_reason": "end_turn",
-                "stop_sequence": None,
-                "usage": {"input_tokens": 5000, "output_tokens": 500},
-            },
-        )
-
-    return anthropic.Anthropic(
-        api_key="test", http_client=httpx2.Client(transport=httpx2.MockTransport(handler)), max_retries=0
-    )
-
-
-def recorded(name: str) -> str:
-    return (FIXTURES / name).read_text(encoding="utf-8")
+CASE_002 = Path(__file__).parent.parent / "data" / "cases" / "case_002"
 
 
 def test_case_002_end_to_end_catches_the_quantity_error():

@@ -39,6 +39,14 @@ class TradeReport:
     def count(self, status: str) -> int:
         return sum(1 for c in self.checks if c.status == status)
 
+    @property
+    def verdict(self) -> str:
+        if self.count("FAIL"):
+            return "ISSUES FOUND"
+        if self.count("REVIEW"):
+            return "NEEDS REVIEW"
+        return "ALL CHECKS PASSED"
+
 
 def check_trade(
     contract_pdf: str | Path,
@@ -77,9 +85,8 @@ def format_report(report: TradeReport, title: str) -> str:
     lines.append("")
     if report.unverified:
         lines.append(f"Unverified fields: {', '.join(sorted(report.unverified))}")
-    verdict = "ISSUES FOUND" if report.count("FAIL") else "NEEDS REVIEW" if report.count("REVIEW") else "ALL CHECKS PASSED"
     lines.append(
-        f"Result: {verdict}  ({report.count('FAIL')} fail, {report.count('REVIEW')} review, "
+        f"Result: {report.verdict}  ({report.count('FAIL')} fail, {report.count('REVIEW')} review, "
         f"{report.count('PASS')} pass)"
     )
     cost = f"${report.cost_usd:.4f}" if report.cost_usd is not None else "unknown"
