@@ -1,0 +1,22 @@
+@page { size: A4; margin: 18mm 16mm 20mm 16mm; }
+body { font-family: "Times New Roman", Times, serif; font-size: 10.5pt; color: #111; line-height: 1.35; }
+h1 { font-size: 15pt; text-align: center; margin: 0 0 2mm 0; letter-spacing: 0.5px; }
+.sub { text-align: center; font-size: 10pt; margin-bottom: 6mm; }
+.head { display: flex; justify-content: space-between; border-bottom: 1.5px solid #111; padding-bottom: 3mm; margin-bottom: 5mm; }
+.head .co { font-weight: bold; font-size: 12pt; }
+.head .addr { font-size: 9pt; }
+.meta { text-align: right; font-size: 9.5pt; }
+table { width: 100%; border-collapse: collapse; margin: 3mm 0; }
+td, th { border: 1px solid #444; padding: 1.6mm 2mm; vertical-align: top; text-align: left; }
+th { background: #eee; font-weight: bold; }
+td.k { width: 32%; font-weight: bold; background: #f6f6f6; }
+td.num, th.num { text-align: right; white-space: nowrap; }
+.clause { margin: 2.5mm 0; }
+.clause b { display: inline-block; min-width: 34mm; }
+.parties { display: flex; gap: 6mm; margin-bottom: 4mm; }
+.parties > div { flex: 1; border: 1px solid #444; padding: 2mm 3mm; }
+.parties .lbl { font-size: 8.5pt; text-transform: uppercase; color: #444; }
+.sign { display: flex; gap: 12mm; margin-top: 12mm; }
+.sign > div { flex: 1; border-top: 1px solid #111; padding-top: 1.5mm; font-size: 9.5pt; }
+.words { font-style: italic; margin: 2mm 0 4mm 0; }
+.footer { margin-top: 10mm; text-align: center; font-size: 7.5pt; color: #666; }

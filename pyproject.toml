@@ -1,0 +1,24 @@
+[project]
+name = "trade-doc-checker"
+version = "0.1.0"
+description = "Checks commodity trade invoices against their sales contracts using an LLM for extraction and plain code for the checks."
+requires-python = ">=3.11"
+dependencies = [
+    "anthropic",
+    "pydantic>=2",
+    "python-dotenv",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["checker"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
