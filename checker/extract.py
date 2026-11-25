@@ -52,6 +52,15 @@ copied character for character. Keep it short: just the words or number that hol
 - Dates: YYYY-MM-DD (e.g. "22 April 2026" becomes 2026-04-22)."""
 
 
+def fallback_settings(model: str) -> dict:
+    """If the model declines a request, the API can retry it on a fallback model
+    inside the same call. Claude Haiku models have no server-side fallback, so
+    the setting is not sent to them."""
+    if model.startswith("claude-haiku"):
+        return {}
+    return {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"}
+
+
 class ExtractionError(Exception):
     """The API answered, but not with a usable extraction."""
 
@@ -104,10 +113,7 @@ def extract(
             ],
             output_format=schema,
             output_config={"effort": effort},
-            # If the model declines a request, the API retries it on a
-            # fallback model inside the same call.
-            betas=["server-side-fallback-2026-07-01"],
-            fallbacks="default",
+            **fallback_settings(model),
         )
     except ValidationError as e:
         raise ExtractionError(f"response did not match the {doc_type} schema: {e}") from e

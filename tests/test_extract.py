@@ -101,3 +101,17 @@ def test_response_not_matching_schema_raises():
 
     with pytest.raises(ExtractionError, match="schema"):
         extract(CASE / "contract.pdf", "contract", client=client)
+
+
+def test_haiku_requests_have_no_fallback_setting():
+    captured = {}
+    body = api_response(expected_contract_json())
+    body["model"] = "claude-haiku-5-5"
+    client = fake_client(body, captured)
+
+    result = extract(CASE / "contract.pdf", "contract", client=client, model="claude-haiku-5-5")
+
+    assert "fallbacks" not in captured["body"]
+    assert "server-side-fallback" not in captured["headers"].get("anthropic-beta", "")
+    # 3000 input tokens at $0.10/M + 500 output tokens at $0.50/M
+    assert result.cost_usd == pytest.approx(0.00055)
