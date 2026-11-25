@@ -3,9 +3,10 @@
 from pathlib import Path
 
 import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
-from checker.api import app, get_client
+from checker.api import app, case_dir, get_client
 from tests.fakes import recorded, replay_client
 
 CASE_002 = Path(__file__).parent.parent / "data" / "cases" / "case_002"
@@ -65,8 +66,17 @@ def test_upload_rejects_non_pdf(api):
 
 
 @pytest.mark.parametrize("case_id", ["case_999", "../checker", "case_1"])
-def test_unknown_case_is_404(api, case_id):
-    assert api.post(f"/api/cases/{case_id}/check").status_code == 404
+def test_unknown_case_is_refused(api, case_id):
+    # 404 from the case handler, or 405 when "../" makes the URL miss the API
+    # route and land on the built frontend: either way no check runs.
+    assert api.post(f"/api/cases/{case_id}/check").status_code in (404, 405)
+
+
+@pytest.mark.parametrize("case_id", ["../checker", "case_1", "case_001/../../checker", "case_999"])
+def test_case_dir_accepts_only_existing_case_names(case_id):
+    with pytest.raises(HTTPException) as error:
+        case_dir(case_id)
+    assert error.value.status_code == 404
 
 
 def test_case_pdf_is_served(api):
