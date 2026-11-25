@@ -38,18 +38,21 @@ PASS    total_is_correct                63,800 × 412.50 = 26,317,500
 Result: ISSUES FOUND  (1 fail, 0 review, 8 pass)
 ```
 
-## Early results
+## Results
 
-First live runs, Claude Opus 5.5 at effort `medium`, on the two initial test cases:
+Eval on all 30 test cases (see [Eval](#eval)):
 
-| Document | Fields correct | Source quotes found in PDF | Tokens in / out | Cost | Time |
-|---|---|---|---|---|---|
-| Contract (2 pages) | 14/14 | 14/14 | 6,839 / 500 | $0.037 | 9.9 s |
-| Invoice (1 page) | 14/14 | 14/14 | 4,869 / 496 | $0.029 | 6.7 s |
+| Run | Model | Effort | Fields correct | Problems caught | Missed | False alarms | Cost / trade | Median time |
+|---|---|---|---|---|---|---|---|---|
+| Baseline | Claude Opus 5.5 | medium | 840/840 | 19/19 | 0 | 0 of 251 | $0.057 | 4.7 s |
 
-About $0.07 per trade. The two extractions run in parallel, so a full check takes
-roughly as long as the slower one. These two cases are clean and simple; the full
-test set below adds harder variations.
+Every field and every check matched the answer keys, including the three values
+that are absent from their documents: the model returned `null` for the two
+missing tolerance clauses and the missing B/L date instead of inventing them.
+
+A perfect score also means this test set no longer separates good settings from
+better ones. The next experiments therefore test cheaper and faster settings
+against the same bar, and harder documents (see [About the test data](#about-the-test-data)).
 
 ## Test set
 
