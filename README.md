@@ -71,6 +71,10 @@ where a cheaper model would be expected to fall behind first. If it does, a
 common pattern is to keep Haiku as the default and send only uncertain trades
 (those that need review) to a stronger model.
 
+On scanned invoices, see [Scanned documents](#scanned-documents): with OCR, all
+planted problems are caught and nothing is missed; the remaining reviews are on
+the poorest scans.
+
 ## Test set
 
 36 cases (`data/cases/`, listed in [`data/cases/INDEX.md`](data/cases/INDEX.md)):
@@ -138,6 +142,13 @@ as long as every number in it is identical.
 | Before (no OCR) | Haiku 5.5, low | 168/168 | 84/168 | 0/3 (all 3 sent to review) | 0 | 51 |
 | OCR, first version | Haiku 5.5, low | 168/168 | 159/168 | 3/3 | 0 | 12 |
 | OCR, first version | Opus 5.5, medium | 168/168 | 156/168 | 2/3 (1 sent to review) | 0 | 13 |
+| **OCR, current version** | Haiku 5.5, low | 168/168 | 160/168 | **3/3** | **0** | **6** |
+
+With the current version, every good- and fair-quality scan comes out fully
+correct, and all 6 remaining reviews are on the two poorest typewriter-font scans
+(case_033, case_035), where OCR misreads digits. Those reviews are the system
+working as intended: it can't confirm those numbers, so it hands them to a person
+instead of guessing.
 
 What these runs showed:
 
@@ -151,7 +162,8 @@ What these runs showed:
   description wrapped as "...in" / "bulk" (a last piece shorter than the minimum
   allowed), and on another scan OCR read "Corn" as "Con". The current version
   allows shorter pieces and a few misread letters on OCR text, with numbers still
-  exact; tests cover both cases.
+  exact; tests cover both cases. Unnecessary reviews went from 51 (no OCR) to 12
+  (first version) to 6.
 - **Text PDFs were unaffected:** in the same full run, the 30 text-PDF cases still
   scored 840/840 fields, 19/19 problems and no extra reviews.
 
