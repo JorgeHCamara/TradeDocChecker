@@ -161,3 +161,50 @@ def test_misread_number_on_a_scan_is_not_verified():
 
     assert "quantity" in unverified
     assert "invoice_number" not in unverified
+
+
+# --- OCR misreads: letters may be off, numbers may not --------------------------------
+
+COMMODITY = "Brazilian Yellow Corn, GMO, crop 2026, in bulk"
+
+
+@pytest.mark.parametrize(
+    "quote, document, fuzzy, found",
+    [
+        # OCR read "Corn" as "Con" (seen on case_036): accepted on OCR text only.
+        (COMMODITY, "Commodity:BrazilianYellowCon,GMo,crop2026,inbulk", True, True),
+        (COMMODITY, "Commodity:BrazilianYellowCon,GMo,crop2026,inbulk", False, False),
+        # A different number is never accepted, however similar the rest is.
+        (COMMODITY, "Commodity:BrazilianYellowCon,GMo,crop2028,inbulk", True, False),
+        ("Unit value (USD/MT)", "Unit value (USD/NT)", True, True),
+        # Short quotes must match exactly.
+        ("USD/MT", "USD/NT", True, False),
+        # A wrapped cell whose last line is short (seen on case_031).
+        (COMMODITY, "Brazilian Yellow Corn,GMO, crop 2026, in\n64,880.250\nbulk", False, True),
+    ],
+)
+def test_ocr_misreads(quote, document, fuzzy, found):
+    assert quote_in_text(quote, squash(document), fuzzy=fuzzy) is found
+
+
+@pytest.mark.parametrize(
+    "case_id",
+    [
+        "case_031",
+        "case_032",
+        "case_034",
+        "case_036",
+        pytest.param("case_033", marks=pytest.mark.xfail(strict=True, reason="poor scan: description in 4 fragments, year missing")),
+    ],
+)
+def test_commodity_quote_is_verified_on_scans(case_id):
+    pytest.importorskip("rapidocr_onnxruntime")
+    printed = {
+        "case_031": COMMODITY,
+        "case_033": COMMODITY,
+        "case_036": COMMODITY,
+        "case_032": "Brazilian Yellow Soybeans, GMO, crop 2025/2026, in bulk",
+        "case_034": "Brazilian Yellow Soybeans, GMO, crop 2025/2026, in bulk",
+    }[case_id]
+    text = squash(document_text(CASES_DIR / case_id / "invoice.pdf").text)
+    assert quote_in_text(printed, text, fuzzy=True)

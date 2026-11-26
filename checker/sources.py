@@ -16,7 +16,8 @@ accents and capitals are ignored, because OCR often drops spaces ("22April
 2026") and accents ("Paranagua"). Numbers stay strict: every digit must
 match, and a number can't match inside a longer number. A quote that wraps
 inside a table cell may be found in up to three pieces, never split inside
-a number.
+a number. On OCR text only, a longer quote may also differ from the page by a
+few letters (OCR read "Corn" as "Con"), as long as every number in it matches.
 
 Known limit: if the model and the OCR misread the same digit the same way,
 the wrong value passes this check. They read the page differently, so this
@@ -27,6 +28,7 @@ import re
 import threading
 import unicodedata
 from dataclasses import dataclass
+from difflib import SequenceMatcher
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal
@@ -144,25 +146,51 @@ def _match_in_pieces(quote: str, text: str, start: int, pieces_left: int) -> boo
 # pieces, in order, each at least MIN_PIECE characters long, and never split
 # inside a number.
 MAX_PIECES = 3
-MIN_PIECE = 6
+MIN_PIECE = 4
+
+# OCR sometimes misreads a letter ("Corn" -> "Con", "USD/MT" -> "USD/NT").
+# On OCR text, a quote of at least FUZZY_MIN_LENGTH characters may match a
+# stretch of text that is FUZZY_MIN_RATIO similar, but only if the numbers in
+# both are exactly the same: letters may be off, digits may not.
+FUZZY_MIN_LENGTH = 10
+FUZZY_MIN_RATIO = 0.9
 
 
-def quote_in_text(quote: str, squashed_text: str) -> bool:
-    """Is the quote in the (squashed) document text?"""
+def _fuzzy_match(quote: str, text: str) -> bool:
+    if len(quote) < FUZZY_MIN_LENGTH:
+        return False
+    numbers = re.findall(r"\d+", quote)
+    for size in range(len(quote) - 2, len(quote) + 3):  # OCR may drop or add a letter or two
+        for start in range(0, len(text) - size + 1):
+            window = text[start : start + size]
+            matcher = SequenceMatcher(None, quote, window, autojunk=False)
+            if matcher.real_quick_ratio() < FUZZY_MIN_RATIO or matcher.quick_ratio() < FUZZY_MIN_RATIO:
+                continue  # cheap upper bounds: skip windows that can't be similar enough
+            if matcher.ratio() >= FUZZY_MIN_RATIO and re.findall(r"\d+", window) == numbers:
+                return True
+    return False
+
+
+def quote_in_text(quote: str, squashed_text: str, fuzzy: bool = False) -> bool:
+    """Is the quote in the (squashed) document text? `fuzzy` allows a few
+    misread letters (use it for OCR text only)."""
     q = squash(quote)
     if not q:
         return False
-    return _match_in_pieces(q, squashed_text, 0, MAX_PIECES)
+    if _match_in_pieces(q, squashed_text, 0, MAX_PIECES):
+        return True
+    return fuzzy and _fuzzy_match(q, squashed_text)
 
 
-def unverified_fields(extraction: BaseModel, document_text: str) -> set[str]:
-    """Names of the fields whose value is set but whose source isn't in the text."""
+def unverified_fields(extraction: BaseModel, document_text: str, fuzzy: bool = False) -> set[str]:
+    """Names of the fields whose value is set but whose source isn't in the text.
+    Pass fuzzy=True when the text came from OCR."""
     haystack = squash(document_text)
     unverified = set()
     for name in type(extraction).model_fields:
         field = getattr(extraction, name)
         if field.value is None:
             continue  # nothing was extracted, so there is nothing to verify
-        if not field.source or not quote_in_text(field.source, haystack):
+        if not field.source or not quote_in_text(field.source, haystack, fuzzy):
             unverified.add(name)
     return unverified

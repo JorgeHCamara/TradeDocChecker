@@ -74,8 +74,13 @@ def check_trade(
         contract, invoice = contract_job.result(), invoice_job.result()
         contract_text, invoice_text = contract_text_job.result(), invoice_text_job.result()
 
-    unverified = {f"contract.{f}" for f in unverified_fields(contract.data, contract_text.text)}
-    unverified |= {f"invoice.{f}" for f in unverified_fields(invoice.data, invoice_text.text)}
+    unverified = {
+        f"contract.{f}"
+        for f in unverified_fields(contract.data, contract_text.text, fuzzy=contract_text.method == "ocr")
+    }
+    unverified |= {
+        f"invoice.{f}" for f in unverified_fields(invoice.data, invoice_text.text, fuzzy=invoice_text.method == "ocr")
+    }
 
     checks = run_checks(contract.data, invoice.data, unverified)
     return TradeReport(

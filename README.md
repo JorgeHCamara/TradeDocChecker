@@ -127,17 +127,46 @@ digits only, because OCR often drops spaces and accents ("22April 2026",
 "Paranagua"). Numbers stay strict: every digit must match, a number can't match
 inside a longer number, and a misread like 60,580 for 60,850 is rejected. A quote
 that wraps inside a table cell may be found in up to three pieces, since OCR reads
-a table row by row.
+a table row by row. On OCR text only, a quote of 10+ characters may also differ
+from the page by a few letters (OCR read "Corn" as "Con", "USD/MT" as "USD/NT"),
+as long as every number in it is identical.
+
+### Results on the 6 scanned invoices
+
+| Run | Model | Fields correct | Quotes verified (both documents) | Planted problems caught | Missed | Extra reviews (of 51 clean checks) |
+|---|---|---|---|---|---|---|
+| Before (no OCR) | Haiku 5.5, low | 168/168 | 84/168 | 0/3 (all 3 sent to review) | 0 | 51 |
+| OCR, first version | Haiku 5.5, low | 168/168 | 159/168 | 3/3 | 0 | 12 |
+| OCR, first version | Opus 5.5, medium | 168/168 | 156/168 | 2/3 (1 sent to review) | 0 | 13 |
+
+What these runs showed:
+
+- **The models read the scans better than the OCR.** Both models extracted every
+  field correctly, even on the poorest scans. Every review left after adding OCR
+  came from the source check failing to confirm a value that was in fact correct.
+  On scans, the weak part is the check, not the model.
+- **Before OCR the system was safe but useless on scans:** nothing was missed, but
+  every check needed a person.
+- **The first OCR version still sent a good-quality scan to review.** The commodity
+  description wrapped as "...in" / "bulk" (a last piece shorter than the minimum
+  allowed), and on another scan OCR read "Corn" as "Con". The current version
+  allows shorter pieces and a few misread letters on OCR text, with numbers still
+  exact; tests cover both cases.
+- **Text PDFs were unaffected:** in the same full run, the 30 text-PDF cases still
+  scored 840/840 fields, 19/19 problems and no extra reviews.
 
 Known limits:
 
 - On the poorest scans of the typewriter-font invoice layout (case_033, case_035),
-  OCR reads some 0s as 8s. Those values can't be verified, so their checks go to
-  review. Rendering pages larger for OCR made no difference (24/30 key values read
-  at 2×, 24/30 at 3×, 23/30 at 4×). The tests mark both cases as known failures.
+  OCR reads some 0s as 8s and splits text into many fragments. Those values can't
+  be verified, so their checks go to review. Rendering pages larger for OCR made no
+  difference (24/30 key values read at 2×, 24/30 at 3×, 23/30 at 4×). The tests
+  mark these as known failures.
 - If the model and the OCR misread the same digit the same way, the wrong value
   would pass the source check. They read the page differently, so this is unlikely,
   but possible.
+- OCR runs on the CPU and adds time: scanned cases took 10–18 s in the eval
+  (several cases at once) against about 4.5 s for text PDFs.
 
 ## Project layout
 
