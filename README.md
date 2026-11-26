@@ -180,6 +180,49 @@ Known limits:
 - OCR runs on the CPU and adds time: scanned cases took 10–18 s in the eval
   (several cases at once) against about 4.5 s for text PDFs.
 
+### Choosing the OCR engine
+
+RapidOCR was first chosen for practical reasons (installs with `pip` alone, ships
+its models, fast on a CPU) and checked on one scan. To test that choice,
+`scripts/ocr_benchmark.py` runs three engines on the six scanned invoices and
+checks six printed values per scan (invoice number, contract reference, quantity,
+unit price, total, commodity description) with the same matching rules as the
+source check. So a value counts as confirmed only if the source check would have
+verified it. No API calls are made.
+
+| Engine (render size 2×) | Values confirmed | Good scans | Fair scans | Poor scans | Seconds per page | Install size |
+|---|---|---|---|---|---|---|
+| **RapidOCR** | **29/36** | 6/6 | 12/12 | **11/18** | 1.1 | ~470 MB |
+| EasyOCR | 28/36 | 6/6 | 12/12 | 10/18 | 7.7 | ~1.2 GB, plus 94 MB of models downloaded on first run |
+| Tesseract | 22/36 | 6/6 | 12/12 | 4/18 | 0.7 | ~50 MB (Python packages plus the Tesseract program, installed separately) |
+
+Measured on a 4-core cloud machine; install sizes from clean environments.
+Rendering at 4× made every engine slower and none more accurate (RapidOCR 27/36,
+EasyOCR 24/36, Tesseract 22/36).
+
+What it shows:
+
+- **On good and fair scans all three are perfect.** The engines differ only on the
+  three poor scans.
+- **RapidOCR stays the default.** It is as accurate as EasyOCR here (29 vs 28 is one
+  value, not a real difference on a sample this small), about 7× faster, and needs
+  no download when the app runs.
+- **Tesseract is the smallest and fastest, and the weakest on poor scans** with its
+  default settings. Tesseract usually does better after image cleanup (straightening,
+  conversion to black and white), which this benchmark did not do. Where install
+  size matters most and scans are of decent quality, it would be the better choice.
+- **Size is RapidOCR's real cost.** About 400 MB of the 470 MB is OpenCV and ONNX
+  Runtime. That matters for deployment: it rules out size-limited options such as a
+  plain AWS Lambda package, and it is why OCR is an optional extra here.
+- **The sample is small:** six scans, three of them poor. A real deployment should
+  repeat this on the customer's own scanned documents.
+
+To run it, install the engines you want to compare (see the script's docstring):
+
+```bash
+python scripts/ocr_benchmark.py
+```
+
 ## Project layout
 
 ```
@@ -195,6 +238,7 @@ data/cases/case_NNN/    One test case: contract.pdf, invoice.pdf, expected.json 
 data/cases/INDEX.md     What each test case tests
 data/templates/         HTML layouts used to generate the test PDFs
 scripts/generate_cases.py  Generates case_003 onward (PDFs + answer keys)
+scripts/ocr_benchmark.py   Compares OCR engines on the scanned test invoices
 tests/                  Tests that run without API calls
 ```
 
@@ -207,7 +251,7 @@ pip install -e ".[dev]"
 cp .env.example .env             # then put your Anthropic API key in .env
 ```
 
-To verify quotes on scanned PDFs, also install the OCR extra (about 200 MB):
+To verify quotes on scanned PDFs, also install the OCR extra (about 470 MB):
 
 ```bash
 pip install -e ".[dev,ocr]"

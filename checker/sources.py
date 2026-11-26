@@ -7,7 +7,7 @@ field is marked unverified and any check that uses it asks for human review.
 Where the document's text comes from:
 - Typed or digitally generated PDFs have a text layer, read directly.
 - Scanned PDFs are only images. Their text is read with OCR, an optional
-  extra (pip install -e ".[ocr]", about 200 MB). Without it, a scan has no
+  extra (pip install -e ".[ocr]", about 470 MB). Without it, a scan has no
   text to check against, so its quotes stay unverified and every check that
   uses them goes to review: safe, but a person has to check everything.
 
